@@ -271,20 +271,7 @@ export class DatabaseStorage implements IStorage {
       accuracy: avgAccuracy,
     };
   }
-  async getUserById(userId: number) {
-    try {
-      const user = await db
-        .select()
-        .from(users)
-        .where(eq(users.id, userId))
-        .limit(1);
-      
-      return user[0] || null;
-    } catch (error) {
-      console.error('Error getting user by ID:', error);
-      throw error;
-    }
-  }
+
   async getAdminStats(): Promise<{
     teachers: number;
     students: number;

@@ -15,13 +15,18 @@ interface CreateTeacherModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const createTeacherSchema = insertUserSchema.pick({
-  name: true,
-  email: true,
-  password: true,
-  nip: true,
-  subject: true,
-});
+const createTeacherSchema = insertUserSchema
+  .pick({
+    name: true,
+    email: true,
+    password: true,
+    nip: true,
+    subject: true,
+  })
+  .merge(z.object({
+    role: z.literal("teacher").default("teacher"),
+    isActive: z.boolean().default(true),
+  }));
 
 type CreateTeacherData = z.infer<typeof createTeacherSchema>;
 
