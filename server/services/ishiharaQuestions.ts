@@ -47,7 +47,7 @@ const ISHIHARA_QUESTIONS = [
   {
     imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/7.png",
     correctAnswer: "6",
-    options: ["8", "6", "Tidak Ada", ""],
+    options: ["8", "6", "Tidak Ada", "3"],
     description: "Plate 7 - Normal vision should see 6"
   },
   {

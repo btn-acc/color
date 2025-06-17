@@ -157,7 +157,7 @@ export async function generatePDF(result: TestResultWithRelations): Promise<Buff
         doc.moveDown(2);
       }
       // Footer
-      doc.moveDown(6);
+      doc.moveDown(3);
       doc.font('Helvetica').fontSize(8).text('-'.repeat(80), { align: 'center' });
       doc.text('Dokumen ini dihasilkan secara elektronik melalui Sistem Warnalyze', { align: 'center' });
       doc.text(`Dicetak pada: ${today.toLocaleDateString('id-ID')} pukul ${today.toLocaleTimeString('id-ID')}`, { align: 'center' });
