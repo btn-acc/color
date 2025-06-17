@@ -138,7 +138,7 @@ export default function TestResultModal({ open, onOpenChange, result }: TestResu
               onClick={handleDownloadPDF}
             >
               <Download className="mr-2 h-4 w-4" />
-              Download PDF
+              Download Hasil Test
             </Button>
             <Button
               variant="outline"

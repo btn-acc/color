@@ -54,8 +54,7 @@ export default function Navigation() {
               <Eye className="text-white h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900 tracking-tight">Eyedra</h1>
-              <p className="text-xs text-gray-500 -mt-0.5">SMK Platform</p>
+              <h1 className="text-xl font-bold text-gray-900 tracking-tight">WarnaLyze</h1>
             </div>
           </div>
 

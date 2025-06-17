@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
 import CreateTeacherModal from "@/components/CreateTeacherModal";
+import EditTeacherModal from "@/components/EditTeacherModal";
 import TestResultModal from "@/components/TestResultModal";
 import { Users, GraduationCap, ClipboardList, TriangleAlert, Plus, Edit, Trash2, Download, Eye } from "lucide-react";
 import { calculateAge, formatDate, getStatusColor } from "@/lib/utils";
@@ -15,9 +16,11 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function AdminPanel() {
   const [showCreateTeacher, setShowCreateTeacher] = useState(false);
+  const [showEditTeacher, setShowEditTeacher] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
   const [selectedResult, setSelectedResult] = useState<any>(null);
   const [selectedTeacher, setSelectedTeacher] = useState("all");
+  const [editingTeacher, setEditingTeacher] = useState<any>(null);
   const { toast } = useToast();
 
   const { data: stats } = useQuery({
@@ -35,6 +38,11 @@ export default function AdminPanel() {
   const filteredResults = selectedTeacher === "all" 
     ? allResults 
     : allResults.filter((result: any) => result.teacher.id.toString() === selectedTeacher);
+
+  const handleEditTeacher = (teacher: any) => {
+    setEditingTeacher(teacher);
+    setShowEditTeacher(true);
+  };
 
   const handleDeleteTeacher = async (teacherId: number) => {
     if (!confirm('Apakah Anda yakin ingin menonaktifkan guru ini?')) return;
@@ -87,8 +95,8 @@ export default function AdminPanel() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Admin Panel</h2>
-          <p className="text-gray-600">Kelola akun guru dan pantau laporan test siswa</p>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Super Admin Panel</h2>
+          <p className="text-gray-600">Kelola akun admin dan pantau laporan test siswa</p>
         </div>
 
         {/* Admin Stats */}
@@ -154,13 +162,13 @@ export default function AdminPanel() {
         <Card className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
           <CardHeader>
             <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <CardTitle className="text-lg font-semibold text-gray-900">Manajemen Akun Guru</CardTitle>
+              <CardTitle className="text-lg font-semibold text-gray-900">Manajemen Akun admin</CardTitle>
               <Button 
                 className="bg-primary hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 onClick={() => setShowCreateTeacher(true)}
               >
                 <Plus className="mr-1 h-4 w-4" />
-                Buat Akun Guru
+                Buat Akun admin
               </Button>
             </div>
           </CardHeader>
@@ -169,7 +177,7 @@ export default function AdminPanel() {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-gray-50">
-                    <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Guru</TableHead>
+                    <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admin</TableHead>
                     <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</TableHead>
                     <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mata Pelajaran</TableHead>
                     <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</TableHead>
@@ -205,6 +213,7 @@ export default function AdminPanel() {
                             variant="ghost" 
                             size="sm"
                             className="text-primary hover:text-indigo-900"
+                            onClick={() => handleEditTeacher(teacher)}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -237,7 +246,7 @@ export default function AdminPanel() {
                     <SelectValue placeholder="Pilih guru" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Semua Guru</SelectItem>
+                    <SelectItem value="all">Semua admin</SelectItem>
                     {teachers.map((teacher: any) => (
                       <SelectItem key={teacher.id} value={teacher.id.toString()}>
                         {teacher.name}
@@ -316,9 +325,16 @@ export default function AdminPanel() {
         </Card>
       </div>
 
+      {/* Modals */}
       <CreateTeacherModal
         open={showCreateTeacher}
         onOpenChange={setShowCreateTeacher}
+      />
+
+      <EditTeacherModal
+        open={showEditTeacher}
+        onOpenChange={setShowEditTeacher}
+        teacher={editingTeacher}
       />
 
       <TestResultModal

@@ -35,7 +35,7 @@ export default function TestInterface() {
   const [showResult, setShowResult] = useState(false);
   const [testResult, setTestResult] = useState<any>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<string>("");
-  const [showAnswer, setShowAnswer] = useState(false);
+  const [isAnswered, setIsAnswered] = useState(false);
   
   // Get student data from query params or storage with fallback
   const [studentData, setStudentData] = useState(() => {
@@ -118,8 +118,10 @@ export default function TestInterface() {
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
 
   const handleAnswerSelect = (answer: string) => {
+    if (isAnswered) return;
+    
     setSelectedAnswer(answer);
-    setShowAnswer(true);
+    setIsAnswered(true);
     
     const newAnswer: TestAnswer = {
       questionId: currentQuestion.id,
@@ -138,17 +140,17 @@ export default function TestInterface() {
     
     setAnswers(updatedAnswers);
 
-    // Auto-advance to next question after showing answer
+    // Auto-advance to next question
     setTimeout(() => {
       setSelectedAnswer("");
-      setShowAnswer(false);
+      setIsAnswered(false);
       
       if (currentQuestionIndex < questions.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
       } else {
         handleSubmitTest(updatedAnswers);
       }
-    }, 1500);
+    }, 800);
   };
 
   const handleSubmitTest = (finalAnswers: TestAnswer[]) => {
@@ -163,14 +165,14 @@ export default function TestInterface() {
   };
 
   const handlePreviousQuestion = () => {
-    if (currentQuestionIndex > 0 && !showAnswer) {
+    if (currentQuestionIndex > 0 && !isAnswered) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
       setSelectedAnswer("");
     }
   };
 
   const handleNextQuestion = () => {
-    if (currentQuestionIndex < questions.length - 1 && !showAnswer) {
+    if (currentQuestionIndex < questions.length - 1 && !isAnswered) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswer("");
     }
@@ -309,48 +311,25 @@ export default function TestInterface() {
                   {currentQuestion.options.map((option, index) => (
                     <Button
                       key={index}
-                      onClick={() => !showAnswer && handleAnswerSelect(option)}
-                      disabled={showAnswer}
+                      onClick={() => !isAnswered && handleAnswerSelect(option)}
+                      disabled={isAnswered}
                       variant={selectedAnswer === option ? "default" : "outline"}
                       className={`
-                        h-16 text-xl font-bold transition-all duration-500 transform hover:scale-105 btn-hover-scale
+                        h-16 text-xl font-bold transition-all duration-300 transform hover:scale-105
                         relative overflow-hidden group
                         ${selectedAnswer === option 
-                          ? (option === currentQuestion.correctAnswer 
-                              ? 'bg-green-500 hover:bg-green-600 text-white animate-correct shadow-lg shadow-green-500/25' 
-                              : 'bg-red-500 hover:bg-red-600 text-white animate-wrong shadow-lg shadow-red-500/25')
-                          : 'bg-white hover:bg-gray-50 text-gray-800 border-2 border-gray-200 hover:border-blue-300 hover:shadow-lg'
+                          ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25' 
+                          : 'bg-white hover:bg-blue-50 text-gray-800 border-2 border-gray-200 hover:border-blue-300 hover:shadow-lg hover:text-blue-700'
                         }
-                        ${showAnswer && option === currentQuestion.correctAnswer && selectedAnswer !== option
-                          ? 'bg-green-100 border-green-300 text-green-800 animate-bounce-in'
-                          : ''
-                        }
+                        disabled:opacity-50 disabled:cursor-not-allowed
                       `}
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                       <span className="relative z-10 flex items-center justify-center">
                         {option}
-                        {showAnswer && option === currentQuestion.correctAnswer && (
-                          <CheckCircle className="h-5 w-5 ml-2 animate-bounce-in" />
-                        )}
                       </span>
                     </Button>
                   ))}
                 </div>
-                
-                {showAnswer && (
-                  <div className="mt-6 p-4 bg-white/50 backdrop-blur-sm rounded-xl">
-                    <p className="text-center text-gray-700">
-                      {selectedAnswer === currentQuestion.correctAnswer ? (
-                        <span className="text-green-600 font-semibold">✓ Jawaban Benar!</span>
-                      ) : (
-                        <span className="text-red-600 font-semibold">
-                          ✗ Jawaban yang benar: {currentQuestion.correctAnswer}
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                )}
               </div>
             </div>
 
@@ -358,9 +337,9 @@ export default function TestInterface() {
             <div className="flex justify-between items-center mt-12">
               <Button
                 onClick={handlePreviousQuestion}
-                disabled={currentQuestionIndex === 0 || showAnswer}
+                disabled={currentQuestionIndex === 0 || isAnswered}
                 variant="outline"
-                className="flex items-center space-x-2 px-6 py-3 btn-hover-scale bg-white/80 backdrop-blur-sm border-gray-300 hover:border-blue-400 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center space-x-2 px-6 py-3 transform hover:scale-105 transition-all duration-200 bg-white/80 backdrop-blur-sm border-gray-300 hover:border-blue-400 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ArrowLeft className="h-4 w-4" />
                 <span>Sebelumnya</span>
@@ -388,9 +367,9 @@ export default function TestInterface() {
 
               <Button
                 onClick={handleNextQuestion}
-                disabled={currentQuestionIndex === questions.length - 1 || showAnswer}
+                disabled={currentQuestionIndex === questions.length - 1 || isAnswered}
                 variant="outline"
-                className="flex items-center space-x-2 px-6 py-3 btn-hover-scale bg-white/80 backdrop-blur-sm border-gray-300 hover:border-blue-400 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center space-x-2 px-6 py-3 transform hover:scale-105 transition-all duration-200 bg-white/80 backdrop-blur-sm border-gray-300 hover:border-blue-400 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span>Selanjutnya</span>
                 <ArrowRight className="h-4 w-4" />

@@ -25,6 +25,11 @@ export interface IStorage {
   createTeacher(user: InsertUser): Promise<User>;
   getAllTeachers(): Promise<User[]>;
   deactivateTeacher(id: number): Promise<void>;
+  
+  // NEW: Additional teacher methods for update functionality
+  getTeacherById(id: number): Promise<User | undefined>;
+  getTeacherByNip(nip: string): Promise<User | undefined>;
+  updateTeacher(id: number, data: Partial<InsertUser>): Promise<User>;
 
   // Student methods
   createStudent(student: InsertStudent): Promise<Student>;
@@ -99,6 +104,34 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({ isActive: false })
       .where(eq(users.id, id));
+  }
+
+  // NEW: Get teacher by ID
+  async getTeacherById(id: number): Promise<User | undefined> {
+    const [teacher] = await db
+      .select()
+      .from(users)
+      .where(and(eq(users.id, id), eq(users.role, "teacher")));
+    return teacher || undefined;
+  }
+
+  // NEW: Get teacher by NIP
+  async getTeacherByNip(nip: string): Promise<User | undefined> {
+    const [teacher] = await db
+      .select()
+      .from(users)
+      .where(and(eq(users.nip, nip), eq(users.role, "teacher")));
+    return teacher || undefined;
+  }
+
+  // NEW: Update teacher
+  async updateTeacher(id: number, data: Partial<InsertUser>): Promise<User> {
+    const [updatedTeacher] = await db
+      .update(users)
+      .set(data)
+      .where(eq(users.id, id))
+      .returning();
+    return updatedTeacher;
   }
 
   async createStudent(insertStudent: InsertStudent): Promise<Student> {
@@ -310,9 +343,7 @@ export class DatabaseStorage implements IStorage {
       monthlyTests: monthlyTestsResult.count,
       colorBlind: colorBlindResult.count,
     };
-    
   }
 }
-
 
 export const storage = new DatabaseStorage();

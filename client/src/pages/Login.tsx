@@ -48,7 +48,7 @@ export default function Login() {
               <Eye className="h-12 w-12 text-white" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-white mb-2">IshiTest SMK</h1>
+          <h1 className="text-4xl font-bold text-white mb-2">WarnaLyze</h1>
           <p className="text-white/80 text-lg">Platform Test Buta Warna</p>
         </div>
 

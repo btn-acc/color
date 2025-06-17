@@ -5,6 +5,16 @@ import { loginSchema, studentFormSchema, insertUserSchema } from "@shared/schema
 import bcrypt from "bcrypt";
 import { generatePDF } from "./services/pdfGenerator";
 import { getRandomizedQuestions } from "./services/ishiharaQuestions";
+import { z } from "zod";
+
+// Schema for updating teacher
+const updateTeacherSchema = z.object({
+  name: z.string().min(1, "Nama wajib diisi"),
+  email: z.string().email("Format email tidak valid"),
+  nip: z.string().min(1, "NIP wajib diisi"),
+  subject: z.string().min(1, "Mata pelajaran wajib diisi"),
+  password: z.string().optional(),
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
@@ -134,6 +144,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       res.status(400).json({ message: "Failed to create teacher account" });
+    }
+  });
+
+  // NEW: Update teacher route
+  app.put("/api/admin/teachers/:id", async (req, res) => {
+    try {
+      const teacherId = parseInt(req.params.id);
+      
+      if (!teacherId || isNaN(teacherId)) {
+        return res.status(400).json({ message: "Invalid teacher ID" });
+      }
+
+      // Validate request body
+      const updateData = updateTeacherSchema.parse(req.body);
+      
+      // Check if teacher exists
+      const existingTeacher = await storage.getTeacherById(teacherId);
+      if (!existingTeacher) {
+        return res.status(404).json({ message: "Teacher not found" });
+      }
+
+      // Check if email is already taken by another teacher
+      if (updateData.email !== existingTeacher.email) {
+        const emailExists = await storage.getUserByEmail(updateData.email);
+        if (emailExists && emailExists.id !== teacherId) {
+          return res.status(400).json({ message: "Email sudah digunakan oleh guru lain" });
+        }
+      }
+
+      // Check if NIP is already taken by another teacher
+      if (updateData.nip !== existingTeacher.nip) {
+        const nipExists = await storage.getTeacherByNip(updateData.nip);
+        if (nipExists && nipExists.id !== teacherId) {
+          return res.status(400).json({ message: "NIP sudah digunakan oleh guru lain" });
+        }
+      }
+
+      // Prepare update data
+      const dataToUpdate: any = {
+        name: updateData.name,
+        email: updateData.email,
+        nip: updateData.nip,
+        subject: updateData.subject,
+      };
+
+      // Hash password if provided
+      if (updateData.password && updateData.password.trim() !== "") {
+        dataToUpdate.password = await bcrypt.hash(updateData.password, 10);
+      }
+
+      // Update teacher
+      const updatedTeacher = await storage.updateTeacher(teacherId, dataToUpdate);
+
+      res.json({
+        id: updatedTeacher.id,
+        name: updatedTeacher.name,
+        email: updatedTeacher.email,
+        nip: updatedTeacher.nip,
+        subject: updatedTeacher.subject,
+      });
+    } catch (error) {
+      console.error("Update teacher error:", error);
+      
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Data tidak valid", 
+          errors: error.errors 
+        });
+      }
+      
+      res.status(500).json({ message: "Failed to update teacher" });
     }
   });
 

@@ -67,8 +67,8 @@ export default function TeacherDashboard() {
               Platform Test Buta Warna
             </h1>
             <p className="text-xl text-indigo-100 mb-8 max-w-3xl mx-auto">
-              Sistem testing menggunakan metode Ishihara untuk calon siswa SMK. 
-              Akurat, mudah digunakan, dan hasil dapat diunduh dalam format PDF.
+              Sistem testing menggunakan metode Ishihara untuk melakukan test buta warna dengan 
+              Akurat, mudah digunakan, dan hasil test dapat diunduh dalam format PDF.
             </p>
             <Button
               className="bg-white text-primary hover:bg-gray-50 px-8 py-3 rounded-xl font-semibold text-lg transition-all transform hover:scale-105 shadow-lg"
