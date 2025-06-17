@@ -187,6 +187,7 @@ export class DatabaseStorage implements IStorage {
           id: students.id,
           name: students.name,
           birthDate: students.birthDate,
+          gender: students.gender,
           major: students.major,
         },
         teacher: {
@@ -217,6 +218,7 @@ export class DatabaseStorage implements IStorage {
           id: students.id,
           name: students.name,
           birthDate: students.birthDate,
+          gender: students.gender,
           major: students.major,
         },
         teacher: {
@@ -247,6 +249,7 @@ export class DatabaseStorage implements IStorage {
           id: students.id,
           name: students.name,
           birthDate: students.birthDate,
+          gender: students.gender,
           major: students.major,
         },
         teacher: {

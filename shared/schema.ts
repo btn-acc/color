@@ -20,6 +20,7 @@ export const students = pgTable("students", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   birthDate: text("birth_date").notNull(),
+  gender: text("gender").notNull(),
   major: text("major"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
@@ -98,6 +99,10 @@ export const loginSchema = z.object({
 export const studentFormSchema = z.object({
   name: z.string().min(1, "Nama lengkap wajib diisi"),
   birthDate: z.string().min(1, "Tanggal lahir wajib diisi"),
+  gender: z.enum(["Laki-laki", "Perempuan"], {
+    required_error: "Jenis kelamin wajib dipilih",
+    invalid_type_error: "Jenis kelamin tidak valid"
+  }),
   major: z.string().optional(),
 });
 

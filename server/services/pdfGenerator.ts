@@ -12,6 +12,7 @@ interface TestResultWithRelations {
   student: {
     name: string;
     birthDate: string;
+    gender: string;
     major: string | null;
   };
   teacher: {
@@ -81,7 +82,7 @@ export async function generatePDF(result: TestResultWithRelations): Promise<Buff
       const infoPasien = [
         ['Nama', result.student.name.toUpperCase()],
         ['Tempat/Tgl Lahir', birthDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })],
-        // ['Jenis Kelamin', 'Laki-laki/Perempuan'],
+        ['Jenis Kelamin', result.student.gender],
         ['Umur', `${age} Tahun`],
         ['Jurusan', result.student.major || '-']
       ];
