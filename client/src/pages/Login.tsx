@@ -125,13 +125,14 @@ export default function Login() {
               </form>
             </Form>
 
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
-                Akun guru dibuat oleh administrator.
-                <br />
-                Hubungi admin jika mengalami masalah login.
-              </p>
-            </div>
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              Yuk, periksa kesehatan mata secara berkala!
+              <br />
+              Tes sederhana bisa membantu mengenali gangguan sejak awal.
+            </p>
+          </div>
+
           </CardContent>
         </Card>
       </div>
