@@ -5,145 +5,145 @@ const ISHIHARA_QUESTIONS = [
   {
     imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/0.png",
     correctAnswer: "12",
-    options: ["12", "8", "6", "Tidak Ada"],
+    options: ["12", "Tidak Jelas", "6", "Tidak Terlihat"],
     description: "Plate 0 - Normal vision should see 12"
   },
   {
-    imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/1.png",
+    imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/1.jpg",
     correctAnswer: "8",
-    options: ["Tidak Ada", "3", "6", "8"],
+    options: ["Tidak Terlihat", "3", "Tidak Jelas", "8"],
     description: "Plate 1 - Normal vision should see 8"
   },
   {
     imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/2.jpg",
-    correctAnswer: "45",
-    options: ["15", "45", "25", "Tidak Ada"],
-    description: "Plate 2 - Normal vision should see 45"
+    correctAnswer: "6",
+    options: ["5", "6", "Tidak Jelas", "Tidak Terlihat"],
+    description: "Plate 2 - Normal vision should see 6"
   },
   {
     imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/3.jpg",
-    correctAnswer: "26",
-    options: ["5", "6", "26", "Tidak Ada"],
-    description: "Plate 3 - Normal vision should see 26"
+    correctAnswer: "29",
+    options: ["29", "Tidak Jelas", "70", "Tidak Terlihat"],
+    description: "Plate 3 - Normal vision should see 29"
   },
   {
     imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/4.jpg",
-    correctAnswer: "73",
-    options: ["72", "Tidak Ada", "75", "73"],
-    description: "Plate 4 - Normal vision should see 73"
+    correctAnswer: "57",
+    options: ["35", "Tidak Terlihat", "Tidak Jelas", "57"],
+    description: "Plate 4 - Normal vision should see 57"
   },
   {
     imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/5.png",
-    correctAnswer: "15",
-    options: ["75", "17", "15", "Tidak Ada"],
-    description: "Plate 5 - Normal vision should see 15"
+    correctAnswer: "5",
+    options: ["Tidak Jelas", "2", "5", "Tidak Terlihat"],
+    description: "Plate 5 - Normal vision should see 5"
   },
   {
     imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/6.png",
-    correctAnswer: "74",
-    options: ["21", "74", "14", "Tidak Ada"],
-    description: "Plate 6 - Normal vision should see 74"
+    correctAnswer: "3",
+    options: ["3", "5", "Tidak Jelas", "Tidak Terlihat"],
+    description: "Plate 6 - Normal vision should see 3"
   },
   {
     imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/7.png",
-    correctAnswer: "6",
-    options: ["8", "6", "Tidak Ada", "3"],
-    description: "Plate 7 - Normal vision should see 6"
+    correctAnswer: "15",
+    options: ["Tidak Jelas", "17", "Tidak Terlihat", "15"],
+    description: "Plate 7 - Normal vision should see 15"
   },
   {
     imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/8.png",
-    correctAnswer: "45",
-    options: ["Tidak Ada", "2", "45", "23"],
-    description: "Plate 8 - Normal vision should see 5"
+    correctAnswer: "74",
+    options: ["Tidak Terlihat", "74", "Tidak Jelas", "21"],
+    description: "Plate 8 - Normal vision should see 74"
   },
   {
-    imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/9.png",
-    correctAnswer: "5",
-    options: ["15", "45", "5", "Tidak Ada"],
-    description: "Plate 9 - Normal vision should see 15"
+    imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/9.jpg",
+    correctAnswer: "2",
+    options: ["15", "Tidak Jelas", "2", "Tidak Terlihat"],
+    description: "Plate 9 - Normal vision should see 5"
   },
   {
     imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/10.jpg",
-    correctAnswer: "15",
-    options: ["12", "15", "77", "Tidak Ada"],
-    description: "Plate 10 - Normal vision should see 17"
+    correctAnswer: "45",
+    options: ["Tidak Jelas", "45", "15", "Tidak Terlihat"],
+    description: "Plate 10 - Normal vision should see 15"
   },
   {
     imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/11.jpg",
-    correctAnswer: "74",
-    options: ["74", "21", "14", "Tidak Ada"],
+    correctAnswer: "6",
+    options: ["6", "Tidak Jelas", "8", "Tidak Terlihat"],
     description: "Plate 11 - Normal vision should see 74"
   },
   {
-    imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/12.png",
-    correctAnswer: "73",
-    options: ["5", "Tidak Ada", "73", "2"],
-    description: "Plate 12 - Red-green color blind may not see the number"
+    imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/12.jpg",
+    correctAnswer: "97",
+    options: ["Tidak Jelas", "Tidak Terlihat", "97", "81"],
+    description: "Plate 12 - Normal vision should see 73"
   },
   {
-    imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/13.png",
-    correctAnswer: "Tidak Ada",
-    options: ["29", "79", "Tidak Ada", "20"],
+    imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/13.jpg",
+    correctAnswer: "73",
+    options: ["Tidak Jelas", "73", "Tidak Terlihat", "20"],
     description: "Plate 13 - Normal vision should see 29"
   },
   {
-    imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/14.png",
-    correctAnswer: "Tidak Ada",
-    options: ["Tidak Ada", "15", "4", "25"],
+    imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/14.jpg",
+    correctAnswer: "5",
+    options: ["Tidak Terlihat", "6", "5", "Tidak Jelas"],
     description: "Plate 14 - Normal vision should see 45"
   },
   {
-    imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/15.png",
-    correctAnswer: "26",
-    options: ["26", "6", "Tidak Ada", "2"],
+    imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/15.jpg",
+    correctAnswer: "7",
+    options: ["Tidak Jelas", "6", "Tidak Terlihat", "7"],
     description: "Plate 15 - Normal vision should see 26"
   },
   {
-    imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/16.png",
-    correctAnswer: "42",
-    options: ["4", "24", "Tidak Ada", "42"],
+    imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/16.jpg",
+    correctAnswer: "16",
+    options: ["Tidak Jelas", "16", "Tidak Terlihat", "48"],
     description: "Plate 16 - Normal vision should see 42"
   },
   {
-    imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/17.png",
-    correctAnswer: "Tidak Ada",
-    options: ["35", "15", "Tidak Ada", "5"],
+    imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/17.jpg",
+    correctAnswer: "96",
+    options: ["96", "85", "Tidak Terlihat", "Tidak Jelas"],
     description: "Plate 17 - Normal vision should see 35"
   },
   {
-    imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/18.png",
-    correctAnswer: "Tidak Ada",
-    options: ["Tidak Ada", "8", "95", "9"],
+    imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/18.jpg",
+    correctAnswer: "26",
+    options: ["Tidak Terlihat", "6", "26", "Tidak Jelas"],
     description: "Plate 18 - Normal vision should see 96"
   },
   {
-    imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/19.png",
-    correctAnswer: "Tidak Ada",
-    options: ["6", "Tidak Ada", "5", "45"],
+    imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/19.jpg",
+    correctAnswer: "42",
+    options: ["Tidak Jelas", "Tidak Terlihat", "42", "2"],
     description: "Plate 19 - For red-green blindness, no visible number"
   },
   {
     imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/20.jpg",
-    correctAnswer: "Tidak Ada",
-    options: ["Tidak Ada", "73", "3", "7"],
+    correctAnswer: "35",
+    options: ["Tidak Terlihat", "Tidak Jelas", "6", "35"],
     description: "Plate 20 - For red-green blindness, no visible number"
   },
   {
     imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/21.png",
-    correctAnswer: "Tidak Ada",
-    options: ["26", "6", "2", "Tidak Ada"],
+    correctAnswer: "73",
+    options: ["73", "8", "Tidak Jelas", "Tidak Terlihat"],
     description: "Plate 21 - For red-green blindness, no visible number"
   },
   {
     imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/22.png",
-    correctAnswer: "Tidak Ada",
-    options: ["3", "42", "Tidak Ada", "4"],
+    correctAnswer: "16",
+    options: ["Tidak Jelas", "16", "Tidak Terlihat", "18"],
     description: "Plate 22 - For red-green blindness, no visible number"
   },
   {
     imageUrl: "https://raw.githubusercontent.com/0xcu8e5p4c3/S-P/main/imgcolor/23.png",
-    correctAnswer: "Tidak Ada",
-    options: ["5", "35", "3", "Tidak Ada"],
+    correctAnswer: "7",
+    options: ["5", "Tidak Jelas", "7", "Tidak Terlihat"],
     description: "Plate 23 - For red-green blindness, no visible number"
   }
 ];
