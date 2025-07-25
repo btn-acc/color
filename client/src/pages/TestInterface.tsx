@@ -34,8 +34,8 @@ export default function TestInterface() {
   const [timer, setTimer] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [testResult, setTestResult] = useState<any>(null);
-  const [selectedAnswer, setSelectedAnswer] = useState<string>("");
-  const [isAnswered, setIsAnswered] = useState(false);
+  const [textAnswer, setTextAnswer] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Get student data from query params or storage with fallback
   const [studentData, setStudentData] = useState(() => {
@@ -117,16 +117,15 @@ export default function TestInterface() {
   const currentQuestion = questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
 
-  const handleAnswerSelect = (answer: string) => {
-    if (isAnswered) return;
+  const handleTextSubmit = () => {
+    if (!textAnswer.trim() || isSubmitting) return;
     
-    setSelectedAnswer(answer);
-    setIsAnswered(true);
+    setIsSubmitting(true);
     
     const newAnswer: TestAnswer = {
       questionId: currentQuestion.id,
-      answer,
-      correct: answer === currentQuestion.correctAnswer,
+      answer: textAnswer.trim(),
+      correct: textAnswer.trim().toLowerCase() === currentQuestion.correctAnswer.toLowerCase(),
     };
 
     const updatedAnswers = [...answers];
@@ -142,8 +141,8 @@ export default function TestInterface() {
 
     // Auto-advance to next question
     setTimeout(() => {
-      setSelectedAnswer("");
-      setIsAnswered(false);
+      setTextAnswer("");
+      setIsSubmitting(false);
       
       if (currentQuestionIndex < questions.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -165,16 +164,16 @@ export default function TestInterface() {
   };
 
   const handlePreviousQuestion = () => {
-    if (currentQuestionIndex > 0 && !isAnswered) {
+    if (currentQuestionIndex > 0 && !isSubmitting) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
-      setSelectedAnswer("");
+      setTextAnswer("");
     }
   };
 
   const handleNextQuestion = () => {
-    if (currentQuestionIndex < questions.length - 1 && !isAnswered) {
+    if (currentQuestionIndex < questions.length - 1 && !isSubmitting) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedAnswer("");
+      setTextAnswer("");
     }
   };
 
@@ -303,7 +302,7 @@ export default function TestInterface() {
                 Angka atau huruf apa yang Anda lihat?
               </h3>
               <p className="text-gray-600 text-lg">
-                Pilih jawaban yang paling sesuai dengan apa yang Anda lihat pada gambar di bawah ini.
+                Ketik jawaban yang sesuai dengan apa yang Anda lihat pada gambar di bawah ini.
               </p>
             </div>
             
@@ -326,31 +325,26 @@ export default function TestInterface() {
                 </div>
               </div>
 
-              {/* Answer Options */}
+              {/* Answer Input */}
               <div className="space-y-4">
-                <h4 className="text-xl font-semibold text-gray-800 mb-6">Pilih jawaban Anda:</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  {currentQuestion.options.map((option, index) => (
-                    <Button
-                      key={index}
-                      onClick={() => !isAnswered && handleAnswerSelect(option)}
-                      disabled={isAnswered}
-                      variant={selectedAnswer === option ? "default" : "outline"}
-                      className={`
-                        h-16 text-xl font-bold transition-all duration-300 transform hover:scale-105
-                        relative overflow-hidden group
-                        ${selectedAnswer === option 
-                          ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25' 
-                          : 'bg-white hover:bg-blue-50 text-gray-800 border-2 border-gray-200 hover:border-blue-300 hover:shadow-lg hover:text-blue-700'
-                        }
-                        disabled:opacity-50 disabled:cursor-not-allowed
-                      `}
-                    >
-                      <span className="relative z-10 flex items-center justify-center">
-                        {option}
-                      </span>
-                    </Button>
-                  ))}
+                <h4 className="text-xl font-semibold text-gray-800 mb-6">Masukkan jawaban Anda:</h4>
+                <div className="space-y-4">
+                  <input
+                    type="text"
+                    value={textAnswer}
+                    onChange={(e) => setTextAnswer(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleTextSubmit()}
+                    placeholder="Ketik angka atau huruf yang Anda lihat..."
+                    disabled={isSubmitting}
+                    className="w-full h-16 text-xl font-bold text-center border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition-all duration-300 disabled:opacity-50"
+                  />
+                  <Button
+                    onClick={handleTextSubmit}
+                    disabled={!textAnswer.trim() || isSubmitting}
+                    className="w-full h-12 text-lg font-bold bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {isSubmitting ? "Memproses..." : "Submit Jawaban"}
+                  </Button>
                 </div>
               </div>
             </div>
@@ -359,7 +353,7 @@ export default function TestInterface() {
             <div className="flex justify-between items-center mt-12">
               <Button
                 onClick={handlePreviousQuestion}
-                disabled={currentQuestionIndex === 0 || isAnswered}
+                disabled={currentQuestionIndex === 0 || isSubmitting}
                 variant="outline"
                 className="flex items-center space-x-2 px-6 py-3 transform hover:scale-105 transition-all duration-200 bg-white/80 backdrop-blur-sm border-gray-300 hover:border-blue-400 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -389,7 +383,7 @@ export default function TestInterface() {
 
               <Button
                 onClick={handleNextQuestion}
-                disabled={currentQuestionIndex === questions.length - 1 || isAnswered}
+                disabled={currentQuestionIndex === questions.length - 1 || isSubmitting}
                 variant="outline"
                 className="flex items-center space-x-2 px-6 py-3 transform hover:scale-105 transition-all duration-200 bg-white/80 backdrop-blur-sm border-gray-300 hover:border-blue-400 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -413,7 +407,7 @@ export default function TestInterface() {
                 Angka atau huruf apa yang Anda lihat?
               </h3>
               <p className="text-gray-600 text-sm">
-                Pilih jawaban yang sesuai dengan gambar di bawah ini.
+                Ketik jawaban yang sesuai dengan gambar di bawah ini.
               </p>
             </div>
             
@@ -430,28 +424,26 @@ export default function TestInterface() {
               </div>
             </div>
 
-            {/* Mobile Answer Options */}
+            {/* Mobile Answer Input */}
             <div className="space-y-3 mb-6">
-              <h4 className="text-lg font-semibold text-gray-800 text-center">Pilih jawaban Anda:</h4>
-              <div className="grid grid-cols-2 gap-3">
-                {currentQuestion.options.map((option, index) => (
-                  <Button
-                    key={index}
-                    onClick={() => !isAnswered && handleAnswerSelect(option)}
-                    disabled={isAnswered}
-                    variant={selectedAnswer === option ? "default" : "outline"}
-                    className={`
-                      h-12 text-lg font-bold transition-all duration-300
-                      ${selectedAnswer === option 
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg' 
-                        : 'bg-white hover:bg-blue-50 text-gray-800 border-2 border-gray-200 hover:border-blue-300'
-                      }
-                      disabled:opacity-50 disabled:cursor-not-allowed
-                    `}
-                  >
-                    {option}
-                  </Button>
-                ))}
+              <h4 className="text-lg font-semibold text-gray-800 text-center">Masukkan jawaban Anda:</h4>
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  value={textAnswer}
+                  onChange={(e) => setTextAnswer(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleTextSubmit()}
+                  placeholder="Ketik jawaban..."
+                  disabled={isSubmitting}
+                  className="w-full h-12 text-lg font-bold text-center border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition-all duration-300 disabled:opacity-50"
+                />
+                <Button
+                  onClick={handleTextSubmit}
+                  disabled={!textAnswer.trim() || isSubmitting}
+                  className="w-full h-10 text-base font-bold bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {isSubmitting ? "Memproses..." : "Submit"}
+                </Button>
               </div>
             </div>
           </div>
