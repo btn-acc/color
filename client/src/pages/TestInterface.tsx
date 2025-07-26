@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { X, ArrowLeft, ArrowRight, Eye, Clock, CheckCircle, User, Zap } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { formatDuration } from "@/lib/utils";
+import Swal from 'sweetalert2';
 
 import TestResultModal from "@/components/TestResultModal";
 
@@ -178,20 +179,35 @@ export default function TestInterface() {
   };
 
   const handleExitTest = async () => {
-    if (confirm('Apakah Anda yakin ingin keluar dari test? Data akan hilang.')) {
-      const student = JSON.parse(localStorage.getItem('currentStudent') || '{}');
+    const result = await Swal.fire({
+      title: 'Keluar dari Test?',
+      text: 'Apakah Anda yakin ingin keluar? Semua data akan hilang.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ya, keluar',
+      cancelButtonText: 'Batal',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+    });
 
-      try {
-        await fetch(`/api/test/student/${student.id}`, {
-          method: 'DELETE',
-        });
-      } catch (err) {
-        console.error("Gagal menghapus data test di server:", err);
-      }
+    if (!result.isConfirmed) return;
 
-      localStorage.removeItem('currentStudent');
-      setLocation('/');
+    const student = JSON.parse(localStorage.getItem('currentStudent') || '{}');
+
+    try {
+      await fetch(`/api/test/student/${student.id}`, {
+        method: 'DELETE',
+      });
+    } catch (err) {
+      console.error("Gagal menghapus data test di server:", err);
+
+      await Swal.fire('Gagal', 'Tidak bisa menghapus data test.', 'error');
     }
+
+    localStorage.removeItem('currentStudent');
+    setLocation('/');
+
+    await Swal.fire('Keluar', 'Anda telah keluar dari test.', 'success');
   };
 
 
@@ -381,10 +397,10 @@ export default function TestInterface() {
                     <div
                       key={i}
                       className={`w-2 h-2 rounded-full transition-all duration-300 ${i < currentQuestionIndex
-                          ? 'bg-green-500'
-                          : i === currentQuestionIndex
-                            ? 'bg-blue-500 animate-pulse'
-                            : 'bg-gray-300'
+                        ? 'bg-green-500'
+                        : i === currentQuestionIndex
+                          ? 'bg-blue-500 animate-pulse'
+                          : 'bg-gray-300'
                         }`}
                     />
                   ))}
@@ -476,10 +492,10 @@ export default function TestInterface() {
                   <div
                     key={i}
                     className={`w-2 h-2 rounded-full transition-all duration-300 ${i < currentQuestionIndex
-                        ? 'bg-green-500'
-                        : i === currentQuestionIndex
-                          ? 'bg-blue-500 animate-pulse'
-                          : 'bg-gray-300'
+                      ? 'bg-green-500'
+                      : i === currentQuestionIndex
+                        ? 'bg-blue-500 animate-pulse'
+                        : 'bg-gray-300'
                       }`}
                   />
                 ))}

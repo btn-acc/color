@@ -14,6 +14,7 @@ import { Users, GraduationCap, ClipboardList, TriangleAlert, Plus, Edit, Trash2,
 import { calculateAge, formatDate, getStatusColor } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Pagination } from "@/components/ui/pagination";
+import Swal from 'sweetalert2';
 
 export default function AdminPanel() {
   const [showCreateTeacher, setShowCreateTeacher] = useState(false);
@@ -71,7 +72,18 @@ export default function AdminPanel() {
   };
 
   const handleDeleteTeacher = async (teacherId: number) => {
-    if (!confirm('Apakah Anda yakin ingin menonaktifkan guru ini?')) return;
+    const result = await Swal.fire({
+      title: 'Apakah Anda yakin?',
+      text: 'Admin akan dinonaktifkan dan tidak dapat login!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Ya, nonaktifkan!',
+      cancelButtonText: 'Batal',
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
       const response = await fetch(`/api/admin/teachers/${teacherId}`, {
@@ -84,12 +96,18 @@ export default function AdminPanel() {
         title: "Berhasil",
         description: "Guru berhasil dinonaktifkan",
       });
+
+      // Optionally show success SweetAlert
+      await Swal.fire('Dinonaktifkan!', 'Guru telah dinonaktifkan.', 'success');
+
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Gagal",
         description: "Gagal menonaktifkan guru",
       });
+
+      await Swal.fire('Gagal!', 'Terjadi kesalahan saat menonaktifkan.', 'error');
     }
   };
 
