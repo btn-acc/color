@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,7 +11,7 @@ import Navigation from "@/components/Navigation";
 import CreateTeacherModal from "@/components/CreateTeacherModal";
 import EditTeacherModal from "@/components/EditTeacherModal";
 import TestResultModal from "@/components/TestResultModal";
-import { Users, GraduationCap, ClipboardList, TriangleAlert, Plus, Edit, Trash2, Download, Eye } from "lucide-react";
+import { Users, GraduationCap, ClipboardList, TriangleAlert, Plus, Edit, Trash2, Download, Eye, RefreshCw } from "lucide-react";
 import { calculateAge, formatDate, getStatusColor } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Pagination } from "@/components/ui/pagination";
@@ -71,6 +72,8 @@ export default function AdminPanel() {
     setShowEditTeacher(true);
   };
 
+  const queryClient = useQueryClient();
+
   const handleDeleteTeacher = async (teacherId: number) => {
     const result = await Swal.fire({
       title: 'Apakah Anda yakin?',
@@ -94,20 +97,53 @@ export default function AdminPanel() {
 
       toast({
         title: "Berhasil",
-        description: "Guru berhasil dinonaktifkan",
+        description: "Akun berhasil dinonaktifkan",
       });
 
       // Optionally show success SweetAlert
-      await Swal.fire('Dinonaktifkan!', 'Guru telah dinonaktifkan.', 'success');
+      await Swal.fire('Dinonaktifkan!', 'Akun telah dinonaktifkan.', 'success');
+
+      // Refetch query
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/teachers'] });
+
 
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Gagal",
-        description: "Gagal menonaktifkan guru",
+        description: "Gagal menonaktifkan Akun",
       });
 
       await Swal.fire('Gagal!', 'Terjadi kesalahan saat menonaktifkan.', 'error');
+    }
+  };
+
+  const handleActivateTeacher = async (teacherId: number) => {
+    try {
+      const response = await fetch(`/api/admin/teachers/activate/${teacherId}`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) throw new Error('Failed to activate teacher');
+
+      toast({
+        title: "Berhasil",
+        description: "Akun berhasil diaktifkan kembali",
+      });
+
+      await Swal.fire('Aktif!', 'Akun telah diaktifkan.', 'success');
+
+      // Refetch query
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/teachers'] });
+
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Gagal",
+        description: "Gagal mengaktifkan Akun",
+      });
+
+      await Swal.fire('Gagal!', 'Terjadi kesalahan saat mengaktifkan.', 'error');
     }
   };
 
@@ -115,7 +151,6 @@ export default function AdminPanel() {
     setSelectedResult(result);
     setShowResultModal(true);
   };
-
 
   const handleDownloadPDF = async (resultId: number) => {
     try {
@@ -295,7 +330,7 @@ export default function AdminPanel() {
                         </Badge>
                       </TableCell>
                       <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{teacher.testsCount ?? 0} test</TableCell>
-                      <TableCell className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <TableCell>
                         <div className="flex space-x-2">
                           <Button
                             variant="ghost"
@@ -305,16 +340,29 @@ export default function AdminPanel() {
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-red-600 hover:text-red-900"
-                            onClick={() => handleDeleteTeacher(teacher.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+
+                          {teacher.isActive ? (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-600 hover:text-red-900"
+                              onClick={() => handleDeleteTeacher(teacher.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-green-600 hover:text-green-900"
+                              onClick={() => handleActivateTeacher(teacher.id)}
+                            >
+                              <RefreshCw className="h-4 w-4" />
+                            </Button>
+                          )}
                         </div>
                       </TableCell>
+
                     </TableRow>
                   ))}
 

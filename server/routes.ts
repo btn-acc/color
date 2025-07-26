@@ -21,7 +21,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { email, password } = loginSchema.parse(req.body);
-      
+
       const user = await storage.getUserByEmail(email);
       if (!user || !user.isActive) {
         return res.status(401).json({ message: "Invalid credentials" });
@@ -33,15 +33,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // In a real app, you'd use JWT or sessions
-      res.json({ 
-        user: { 
-          id: user.id, 
-          name: user.name, 
-          email: user.email, 
+      res.json({
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
           role: user.role,
           nip: user.nip,
-          subject: user.subject 
-        } 
+          subject: user.subject
+        }
       });
     } catch (error) {
       res.status(400).json({ message: "Invalid request data" });
@@ -76,7 +76,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/test/submit", async (req, res) => {
     try {
       const { studentId, teacherId, answers, testDuration } = req.body;
-      
+
       const result = await storage.submitTestResult({
         studentId,
         teacherId,
@@ -93,20 +93,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.delete("/api/test/student/:studentId", async (req, res) => {
-  try {
-    const studentId = parseInt(req.params.studentId);
+    try {
+      const studentId = parseInt(req.params.studentId);
 
-    if (isNaN(studentId)) {
-      return res.status(400).json({ message: "Invalid student ID" });
+      if (isNaN(studentId)) {
+        return res.status(400).json({ message: "Invalid student ID" });
+      }
+
+      await storage.deleteTestByStudentId(studentId);
+
+      res.json({ message: "Test result deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete test result" });
     }
-
-    await storage.deleteTestByStudentId(studentId);
-
-    res.json({ message: "Test result deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Failed to delete test result" });
-  }
-});
+  });
 
   // Teacher routes
   app.get("/api/teacher/:teacherId/results", async (req, res) => {
@@ -142,7 +142,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/teachers", async (req, res) => {
     try {
       const teacherData = insertUserSchema.parse(req.body);
-      
+
       // Hash password
       const hashedPassword = await bcrypt.hash(teacherData.password, 10);
       const teacher = await storage.createTeacher({
@@ -151,12 +151,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         role: "teacher",
       });
 
-      res.json({ 
-        id: teacher.id, 
-        name: teacher.name, 
-        email: teacher.email, 
+      res.json({
+        id: teacher.id,
+        name: teacher.name,
+        email: teacher.email,
         nip: teacher.nip,
-        subject: teacher.subject 
+        subject: teacher.subject
       });
     } catch (error) {
       res.status(400).json({ message: "Failed to create teacher account" });
@@ -167,14 +167,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/admin/teachers/:id", async (req, res) => {
     try {
       const teacherId = parseInt(req.params.id);
-      
+
       if (!teacherId || isNaN(teacherId)) {
         return res.status(400).json({ message: "Invalid teacher ID" });
       }
 
       // Validate request body
       const updateData = updateTeacherSchema.parse(req.body);
-      
+
       // Check if teacher exists
       const existingTeacher = await storage.getTeacherById(teacherId);
       if (!existingTeacher) {
@@ -222,14 +222,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Update teacher error:", error);
-      
+
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ 
-          message: "Data tidak valid", 
-          errors: error.errors 
+        return res.status(400).json({
+          message: "Data tidak valid",
+          errors: error.errors
         });
       }
-      
+
       res.status(500).json({ message: "Failed to update teacher" });
     }
   });
@@ -262,18 +262,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/admin/teachers/activate/:id", async (req, res) => {
+    try {
+      const teacherId = parseInt(req.params.id);
+      await storage.activateTeacher(teacherId);
+      res.json({ message: "Teacher activated successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to activate teacher" });
+    }
+  });
+
   // PDF generation
   app.get("/api/results/:id/pdf", async (req, res) => {
     try {
       const resultId = parseInt(req.params.id);
       const result = await storage.getTestResultById(resultId);
-      
+
       if (!result) {
         return res.status(404).json({ message: "Test result not found" });
       }
 
       const pdf = await generatePDF(result);
-      
+
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename="test-result-${result.student.name}-${result.id}.pdf"`);
       res.send(pdf);

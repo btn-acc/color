@@ -25,6 +25,7 @@ export interface IStorage {
   createTeacher(user: InsertUser): Promise<User>;
   getAllTeachers(): Promise<User[]>;
   deactivateTeacher(id: number): Promise<void>;
+  activateTeacher(id: number): Promise<void>;
 
   // NEW: Additional teacher methods for update functionality
   getTeacherById(id: number): Promise<User | undefined>;
@@ -119,6 +120,13 @@ export class DatabaseStorage implements IStorage {
     await db
       .update(users)
       .set({ isActive: false })
+      .where(eq(users.id, id));
+  }
+
+  async activateTeacher(id: number): Promise<void> {
+    await db
+      .update(users)
+      .set({ isActive: true })
       .where(eq(users.id, id));
   }
 
