@@ -112,7 +112,6 @@ const ISHIHARA_QUESTIONS = [
     correctAnswer: "96",
     protanAnswer: "6",
     deutanAnswer: "9",
-    colorBlinfAnswer: "x",
     description: "Plate 17 - Normal vision should see 35"
   },
   {
@@ -120,7 +119,6 @@ const ISHIHARA_QUESTIONS = [
     correctAnswer: "26",
     protanAnswer: "6",
     deutanAnswer: "2",
-    colorBlinfAnswer: "x",
     description: "Plate 18 - Normal vision should see 96"
   },
   {
@@ -128,7 +126,6 @@ const ISHIHARA_QUESTIONS = [
     correctAnswer: "42",
     protanAnswer: "2",
     deutanAnswer: "4",
-    colorBlinfAnswer: "x",
     description: "Plate 19 - For red-green blindness, no visible number"
   },
   {
@@ -136,7 +133,6 @@ const ISHIHARA_QUESTIONS = [
     correctAnswer: "35",
     protanAnswer: "5",
     deutanAnswer: "3",
-    colorBlinfAnswer: "x",
     description: "Plate 20 - For red-green blindness, no visible number"
   },
   {
@@ -174,7 +170,7 @@ export async function getRandomizedQuestions() {
 export function calculateDiagnosis(score: number, totalQuestions: number) {
   const percentage = (score / totalQuestions) * 100;
 
-  if (percentage >= 90) {
+  if (percentage >= 100) {
     return {
       diagnosis: "Penglihatan Warna Normal (Normal Trichromacy)",
       recommendations:

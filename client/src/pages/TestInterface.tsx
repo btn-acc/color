@@ -27,7 +27,7 @@ export default function TestInterface() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  
+
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<TestAnswer[]>([]);
   const [testStartTime] = useState(Date.now());
@@ -36,7 +36,7 @@ export default function TestInterface() {
   const [testResult, setTestResult] = useState<any>(null);
   const [textAnswer, setTextAnswer] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Get student data from query params or storage with fallback
   const [studentData, setStudentData] = useState(() => {
     try {
@@ -75,7 +75,7 @@ export default function TestInterface() {
     };
 
     checkStudentData();
-    
+
     // Listen for storage events from other tabs/windows
     window.addEventListener('storage', checkStudentData);
     return () => window.removeEventListener('storage', checkStudentData);
@@ -110,7 +110,7 @@ export default function TestInterface() {
     const interval = setInterval(() => {
       setTimer(Math.floor((Date.now() - testStartTime) / 1000));
     }, 1000);
-    
+
     return () => clearInterval(interval);
   }, [testStartTime]);
 
@@ -119,9 +119,9 @@ export default function TestInterface() {
 
   const handleTextSubmit = () => {
     if (!textAnswer.trim() || isSubmitting) return;
-    
+
     setIsSubmitting(true);
-    
+
     const newAnswer: TestAnswer = {
       questionId: currentQuestion.id,
       answer: textAnswer.trim(),
@@ -130,20 +130,20 @@ export default function TestInterface() {
 
     const updatedAnswers = [...answers];
     const existingIndex = updatedAnswers.findIndex(a => a.questionId === currentQuestion.id);
-    
+
     if (existingIndex !== -1) {
       updatedAnswers[existingIndex] = newAnswer;
     } else {
       updatedAnswers.push(newAnswer);
     }
-    
+
     setAnswers(updatedAnswers);
 
     // Auto-advance to next question
     setTimeout(() => {
       setTextAnswer("");
       setIsSubmitting(false);
-      
+
       if (currentQuestionIndex < questions.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
       } else {
@@ -154,7 +154,7 @@ export default function TestInterface() {
 
   const handleSubmitTest = (finalAnswers: TestAnswer[]) => {
     const testDuration = Math.floor((Date.now() - testStartTime) / 1000);
-    
+
     submitTestMutation.mutate({
       studentId: studentData.id,
       teacherId: user?.id,
@@ -177,12 +177,23 @@ export default function TestInterface() {
     }
   };
 
-  const handleExitTest = () => {
+  const handleExitTest = async () => {
     if (confirm('Apakah Anda yakin ingin keluar dari test? Data akan hilang.')) {
+      const student = JSON.parse(localStorage.getItem('currentStudent') || '{}');
+
+      try {
+        await fetch(`/api/test/student/${student.id}`, {
+          method: 'DELETE',
+        });
+      } catch (err) {
+        console.error("Gagal menghapus data test di server:", err);
+      }
+
       localStorage.removeItem('currentStudent');
       setLocation('/');
     }
   };
+
 
   if (!studentData || !studentData?.id || !studentData?.name) {
     return (
@@ -236,25 +247,25 @@ export default function TestInterface() {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-2 text-sm text-gray-600">
                 <Clock className="h-4 w-4" />
                 <span className="font-mono">{formatDuration(timer)}</span>
               </div>
-              
+
               <div className="flex items-center space-x-3">
                 <span className="text-sm font-medium text-gray-700">
                   {currentQuestionIndex + 1} / {questions.length}
                 </span>
                 <div className="relative w-32 h-3 bg-gray-200 rounded-full overflow-hidden">
-                  <div 
+                  <div
                     className="h-full enhanced-progress rounded-full transition-all duration-500 ease-out"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
               </div>
-              
+
               <Button
                 variant="ghost"
                 size="sm"
@@ -297,7 +308,7 @@ export default function TestInterface() {
                 <Zap className="h-4 w-4 text-blue-500" />
                 <span className="text-sm font-medium text-gray-700">Soal {currentQuestionIndex + 1}</span>
               </div>
-              
+
               <h3 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-4">
                 Angka atau huruf apa yang Anda lihat?
               </h3>
@@ -305,7 +316,7 @@ export default function TestInterface() {
                 Ketik jawaban yang sesuai dengan apa yang Anda lihat pada gambar di bawah ini.
               </p>
             </div>
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
               {/* Ishihara Test Plate */}
               <div className="flex justify-center">
@@ -369,13 +380,12 @@ export default function TestInterface() {
                   {Array.from({ length: questions.length }, (_, i) => (
                     <div
                       key={i}
-                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                        i < currentQuestionIndex 
-                          ? 'bg-green-500' 
-                          : i === currentQuestionIndex 
-                            ? 'bg-blue-500 animate-pulse' 
+                      className={`w-2 h-2 rounded-full transition-all duration-300 ${i < currentQuestionIndex
+                          ? 'bg-green-500'
+                          : i === currentQuestionIndex
+                            ? 'bg-blue-500 animate-pulse'
                             : 'bg-gray-300'
-                      }`}
+                        }`}
                     />
                   ))}
                 </div>
@@ -395,14 +405,14 @@ export default function TestInterface() {
         </div>
 
         {/* Mobile Content */}
-        <div className="lg:hidden flex-1 flex flex-col p-4">
+        <div className="lg:hidden flex-1 flex flex-col h-full overflow-y-auto px-4 py-6 space-y-6">
           <div className="flex-1 flex flex-col justify-center">
             <div className="text-center mb-6">
               <div className="inline-flex items-center space-x-2 bg-white/50 backdrop-blur-sm rounded-full px-3 py-1 mb-3">
                 <Zap className="h-3 w-3 text-blue-500" />
                 <span className="text-xs font-medium text-gray-700">Soal {currentQuestionIndex + 1}</span>
               </div>
-              
+
               <h3 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-3">
                 Angka atau huruf apa yang Anda lihat?
               </h3>
@@ -410,7 +420,7 @@ export default function TestInterface() {
                 Ketik jawaban yang sesuai dengan gambar di bawah ini.
               </p>
             </div>
-            
+
             {/* Mobile Ishihara Test Plate */}
             <div className="flex justify-center mb-6">
               <div className="relative bg-white rounded-xl shadow-xl p-4">
@@ -418,7 +428,7 @@ export default function TestInterface() {
                   <img
                     src={currentQuestion.imageUrl}
                     alt={`Ishihara test plate ${currentQuestionIndex + 1}`}
-                    className="w-64 h-64 object-cover rounded-lg"
+                    className="w-full max-w-xs sm:max-w-sm md:max-w-md h-auto object-contain rounded-lg"
                   />
                 </div>
               </div>
@@ -435,7 +445,7 @@ export default function TestInterface() {
                   onKeyPress={(e) => e.key === 'Enter' && handleTextSubmit()}
                   placeholder="Ketik jawaban..."
                   disabled={isSubmitting}
-                  className="w-full h-12 text-lg font-bold text-center border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition-all duration-300 disabled:opacity-50"
+                  className="w-full h-12 text-lg font-bold text-center border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition-all duration-300 disabled:opacity-50 px-4"
                 />
                 <Button
                   onClick={handleTextSubmit}
@@ -449,7 +459,7 @@ export default function TestInterface() {
           </div>
 
           {/* Mobile Progress and Timer (moved below answers) */}
-          <div className="bg-white/70 backdrop-blur-sm rounded-lg p-4 shadow-lg border border-white/20">
+          <div className="bg-white/70 backdrop-blur-sm rounded-lg p-4 shadow-lg border border-white/20 sticky bottom-0">
             <div className="space-y-3 pb-3">
               <div className="flex justify-between items-center text-sm text-gray-600">
                 <div className="flex items-center space-x-2">
@@ -460,18 +470,17 @@ export default function TestInterface() {
                   {currentQuestionIndex + 1} / {questions.length}
                 </span>
               </div>
-              
+
               <div className="flex justify-center space-x-1">
                 {Array.from({ length: questions.length }, (_, i) => (
                   <div
                     key={i}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                      i < currentQuestionIndex 
-                        ? 'bg-green-500' 
-                        : i === currentQuestionIndex 
-                          ? 'bg-blue-500 animate-pulse' 
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${i < currentQuestionIndex
+                        ? 'bg-green-500'
+                        : i === currentQuestionIndex
+                          ? 'bg-blue-500 animate-pulse'
                           : 'bg-gray-300'
-                    }`}
+                      }`}
                   />
                 ))}
               </div>

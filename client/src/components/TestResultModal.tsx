@@ -36,14 +36,18 @@ export default function TestResultModal({ open, onOpenChange, result }: TestResu
   const handleBackToDashboard = () => {
     localStorage.removeItem('currentStudent');
     onOpenChange(false);
-    setLocation('/');
+    window.location.href = '/';
   };
 
   const isNormal = result.diagnosis.includes('Normal');
   const age = calculateAge(result.student.birthDate);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(isOpen) => {
+    if (!isOpen) {
+      handleBackToDashboard();
+    }
+    }}>
       <DialogContent className="sm:max-w-2xl max-h-screen overflow-y-auto animate-slide-up">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold mb-2">Hasil Test Buta Warna</DialogTitle>

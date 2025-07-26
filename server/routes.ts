@@ -92,6 +92,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/test/student/:studentId", async (req, res) => {
+  try {
+    const studentId = parseInt(req.params.studentId);
+
+    if (isNaN(studentId)) {
+      return res.status(400).json({ message: "Invalid student ID" });
+    }
+
+    await storage.deleteTestByStudentId(studentId);
+
+    res.json({ message: "Test result deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete test result" });
+  }
+});
+
   // Teacher routes
   app.get("/api/teacher/:teacherId/results", async (req, res) => {
     try {

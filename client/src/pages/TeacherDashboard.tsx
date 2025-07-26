@@ -19,7 +19,13 @@ export default function TeacherDashboard() {
   const [selectedResult, setSelectedResult] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: stats } = useQuery({
+  type Stats = {
+    totalStudents: number;
+    weeklyTests: number;
+    accuracy: number;
+  };
+
+  const { data: stats } = useQuery<Stats>({
     queryKey: [`/api/teacher/${user?.id}/stats`],
     enabled: !!user?.id,
   });
@@ -55,6 +61,22 @@ export default function TeacherDashboard() {
     }
   };
 
+  // Pagination tabel siswa untuk (setiap admin)
+  const [currentPageStudent, setCurrentPageStudent] = useState(1);
+  const resultsStudentPerPage = 10;
+
+  const indexLastStudentResult = currentPageStudent * resultsStudentPerPage;
+  const indexFirstStudentResult = indexLastStudentResult - resultsStudentPerPage;
+  const currentStudent = filteredResults.slice(indexFirstStudentResult, indexLastStudentResult);
+
+  const totalPagesStudent = Math.ceil(filteredResults.length / resultsStudentPerPage);
+
+  const goToPageStudent = (page: number) => {
+    if (page >= 1 && page <= totalPagesStudent) {
+      setCurrentPageStudent(page);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
@@ -67,7 +89,7 @@ export default function TeacherDashboard() {
               Platform Test Buta Warna
             </h1>
             <p className="text-xl text-indigo-100 mb-8 max-w-3xl mx-auto">
-              Sistem testing menggunakan metode Ishihara untuk melakukan test buta warna dengan 
+              Sistem testing menggunakan metode Ishihara untuk melakukan test buta warna dengan
               Akurat, mudah digunakan, dan hasil test dapat diunduh dalam format PDF.
             </p>
             <Button
@@ -97,7 +119,7 @@ export default function TeacherDashboard() {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="test-card bg-white rounded-xl shadow-md">
             <CardContent className="p-6">
               <div className="flex items-center">
@@ -111,7 +133,7 @@ export default function TeacherDashboard() {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="test-card bg-white rounded-xl shadow-md">
             <CardContent className="p-6">
               <div className="flex items-center">
@@ -166,7 +188,7 @@ export default function TeacherDashboard() {
                   </TableRow>
                 </TableHeader>
                 <TableBody className="bg-white divide-y divide-gray-200">
-                  {filteredResults.map((result: any) => (
+                  {currentStudent.map((result: any) => (
                     <TableRow key={result.id} className="hover:bg-gray-50 transition-colors">
                       <TableCell className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -217,8 +239,40 @@ export default function TeacherDashboard() {
                       </TableCell>
                     </TableRow>
                   ))}
+                  {filteredResults.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center text-gray-500 py-4">
+                        Tidak ada hasil test yang ditemukan.
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
+              <div className="flex justify-end items-center p-4 space-x-2">
+                <button
+                  onClick={() => goToPageStudent(currentPageStudent - 1)}
+                  disabled={currentPageStudent === 1}
+                  className="px-3 py-1 text-sm border rounded disabled:opacity-50"
+                >
+                  Prev
+                </button>
+                {Array.from({ length: totalPagesStudent }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => goToPageStudent(page)}
+                    className={`px-3 py-1 text-sm border rounded ${currentPageStudent === page ? 'bg-indigo-500 text-white' : ''}`}
+                  >
+                    {page}
+                  </button>
+                ))}
+                <button
+                  onClick={() => goToPageStudent(currentPageStudent + 1)}
+                  disabled={currentPageStudent === totalPagesStudent}
+                  className="px-3 py-1 text-sm border rounded disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
             </div>
           </CardContent>
         </Card>

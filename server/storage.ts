@@ -1,9 +1,9 @@
-import { 
-  users, 
-  students, 
-  testResults, 
+import {
+  users,
+  students,
+  testResults,
   ishiharaQuestions,
-  type User, 
+  type User,
   type InsertUser,
   type Student,
   type InsertStudent,
@@ -11,7 +11,7 @@ import {
   type InsertTestResult
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, count, and, gte, not } from "drizzle-orm";
+import { eq, desc, count, and, gte, not, countDistinct, sql } from "drizzle-orm";
 import { calculateDiagnosis } from "./services/ishiharaQuestions";
 import dotenv from 'dotenv';
 dotenv.config();
@@ -25,7 +25,7 @@ export interface IStorage {
   createTeacher(user: InsertUser): Promise<User>;
   getAllTeachers(): Promise<User[]>;
   deactivateTeacher(id: number): Promise<void>;
-  
+
   // NEW: Additional teacher methods for update functionality
   getTeacherById(id: number): Promise<User | undefined>;
   getTeacherByNip(nip: string): Promise<User | undefined>;
@@ -33,6 +33,7 @@ export interface IStorage {
 
   // Student methods
   createStudent(student: InsertStudent): Promise<Student>;
+  deleteTestByStudentId(studentId: number): Promise<void>;
 
   // Test result methods
   submitTestResult(data: {
@@ -91,13 +92,28 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async getAllTeachers(): Promise<User[]> {
-    return await db
-      .select()
-      .from(users)
-      .where(eq(users.role, "teacher"))
-      .orderBy(desc(users.createdAt));
-  }
+  async getAllTeachers(): Promise<
+  (User & { testsCount: number })[]
+> {
+  return await db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      password: users.password,
+      role: users.role, 
+      nip: users.nip,
+      subject: users.subject,
+      isActive: users.isActive,
+      createdAt: users.createdAt,
+      testsCount: sql<number>`COUNT(${testResults.id})`.as("testsCount"),
+    })
+    .from(users)
+    .leftJoin(testResults, eq(users.id, testResults.teacherId))
+    .where(eq(users.role, "teacher"))
+    .groupBy(users.id)
+    .orderBy(desc(users.createdAt));
+}
 
   async deactivateTeacher(id: number): Promise<void> {
     await db
@@ -142,6 +158,14 @@ export class DatabaseStorage implements IStorage {
     return student;
   }
 
+  async deleteTestByStudentId(studentId: number) {
+    // Hapus test result terlebih dahulu (karena foreign key constraint)
+    await db.delete(testResults).where(eq(testResults.studentId, studentId));
+
+    // Hapus data siswa dari tabel students
+    await db.delete(students).where(eq(students.id, studentId));
+  }
+
   async submitTestResult(data: {
     studentId: number;
     teacherId: number;
@@ -151,7 +175,7 @@ export class DatabaseStorage implements IStorage {
     const score = data.answers.filter(a => a.correct).length;
     const totalQuestions = data.answers.length;
     const percentage = Math.round((score / totalQuestions) * 100);
-    
+
     const { diagnosis, recommendations } = calculateDiagnosis(score, totalQuestions);
 
     const [result] = await db
@@ -273,14 +297,17 @@ export class DatabaseStorage implements IStorage {
   }> {
     // Get total students tested by this teacher
     const [totalStudentsResult] = await db
-      .select({ count: count() })
+      .select({
+        count: countDistinct(sql`LOWER(${students.name})`)
+      })
       .from(testResults)
+      .innerJoin(students, eq(testResults.studentId, students.id))
       .where(eq(testResults.teacherId, teacherId));
 
     // Get weekly tests (last 7 days)
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
-    
+
     const [weeklyTestsResult] = await db
       .select({ count: count() })
       .from(testResults)
@@ -297,7 +324,7 @@ export class DatabaseStorage implements IStorage {
       .from(testResults)
       .where(eq(testResults.teacherId, teacherId));
 
-    const avgAccuracy = results.length > 0 
+    const avgAccuracy = results.length > 0
       ? Math.round(results.reduce((sum, r) => sum + r.percentage, 0) / results.length)
       : 0;
 
@@ -322,13 +349,16 @@ export class DatabaseStorage implements IStorage {
 
     // Get total students
     const [studentsResult] = await db
-      .select({ count: count() })
-      .from(students);
+      .select({
+        count: countDistinct(sql`LOWER(${students.name})`)
+      })
+      .from(testResults)
+      .innerJoin(students, eq(testResults.studentId, students.id))
 
     // Get monthly tests (last 30 days)
     const monthAgo = new Date();
     monthAgo.setDate(monthAgo.getDate() - 30);
-    
+
     const [monthlyTestsResult] = await db
       .select({ count: count() })
       .from(testResults)
@@ -338,7 +368,7 @@ export class DatabaseStorage implements IStorage {
     const [colorBlindResult] = await db
       .select({ count: count() })
       .from(testResults)
-      .where(not(eq(testResults.diagnosis, "Penglihatan Warna Normal")));
+      .where(not(eq(testResults.diagnosis, "Penglihatan Warna Normal (Normal Trichromacy)")));
 
     return {
       teachers: teachersResult.count,
